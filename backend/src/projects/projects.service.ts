@@ -8,14 +8,7 @@ export class ProjectsService {
   constructor(@InjectModel(Project.name) private projectModel: Model<ProjectDocument>) {}
 
   async findAll() {
-    try {
-      return await this.projectModel.find().exec();
-    } catch (err) {
-      return [
-        { _id: 'proj-1', name: 'Website Redesign', description: 'Next.js Frontend overhaul', color: '#F59E0B' },
-        { _id: 'proj-2', name: 'Mobile App API', description: 'NestJS REST Endpoints', color: '#6366F1' },
-      ];
-    }
+    return this.projectModel.find().exec();
   }
 
   async create(data: { name: string; description?: string; color?: string; userId?: string }) {

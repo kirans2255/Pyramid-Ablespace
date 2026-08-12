@@ -16,10 +16,7 @@ const mongoUri = process.env.MONGODB_URI || (global as any).__MONGO_URI__ || 'mo
   imports: [
     MongooseModule.forRootAsync({
       useFactory: () => ({
-        uri:
-          process.env.MONGODB_URI ||
-          (global as any).__MONGO_URI__ ||
-          'mongodb+srv://pyramid_user:PyramidPass123@cluster0.mongodb.net/pyramid_db?retryWrites=true&w=majority',
+        uri: (global as any).__MONGO_URI__ || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/pyramid_task_db',
       }),
     }),
     MongooseModule.forFeature([

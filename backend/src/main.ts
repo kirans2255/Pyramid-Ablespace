@@ -7,28 +7,21 @@ import mongoose from 'mongoose';
 async function bootstrap() {
   const defaultUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/pyramid_task_db';
   
-  if (!process.env.VERCEL) {
-    try {
-      const conn = await mongoose.connect(defaultUri, { serverSelectionTimeoutMS: 1500 });
-      await conn.disconnect();
-      console.log('Connected to local MongoDB instance:', defaultUri);
-    } catch (err) {
-      try {
-        console.log('Local MongoDB not found. Starting MongoMemoryServer fallback...');
-        const { MongoMemoryServer } = require('mongodb-memory-server');
-        const mongod = await MongoMemoryServer.create();
-        const uri = mongod.getUri();
-        (global as any).__MONGO_URI__ = uri;
-        console.log('MongoMemoryServer running at:', uri);
-      } catch (e) {
-        console.warn('MongoMemoryServer skipped on serverless.');
-      }
-    }
+  try {
+    const conn = await mongoose.connect(defaultUri, { serverSelectionTimeoutMS: 2000 });
+    await conn.disconnect();
+    console.log('Connected to local MongoDB instance:', defaultUri);
+  } catch (err) {
+    console.log('Local MongoDB not found. Starting MongoMemoryServer fallback...');
+    const mongod = await MongoMemoryServer.create();
+    const uri = mongod.getUri();
+    (global as any).__MONGO_URI__ = uri;
+    console.log('MongoMemoryServer running at:', uri);
   }
 
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: true,
+    origin: '*',
     credentials: true,
   });
   app.setGlobalPrefix('api');
