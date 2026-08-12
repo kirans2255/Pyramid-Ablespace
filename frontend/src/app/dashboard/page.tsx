@@ -64,7 +64,7 @@ export default function DashboardPage() {
     }
 
     try {
-      const activeUserId = user._id || user.email || 'guest-1';
+      const activeUserId = user?._id || user?.email || 'guest-1';
       const taskData = await fetchTasks({
         projectId: currentProject || undefined,
         userId: activeUserId,
