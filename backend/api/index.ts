@@ -19,16 +19,21 @@ export default async function handler(req: any, res: any) {
     return;
   }
 
-  if (!cachedServer) {
-    const app = await NestFactory.create(AppModule);
-    app.enableCors({
-      origin: true,
-      credentials: true,
-    });
-    app.setGlobalPrefix('api');
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-    await app.init();
-    cachedServer = app.getHttpAdapter().getInstance();
+  try {
+    if (!cachedServer) {
+      const app = await NestFactory.create(AppModule, { logger: ['error', 'warn'] });
+      app.enableCors({
+        origin: true,
+        credentials: true,
+      });
+      app.setGlobalPrefix('api');
+      app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+      await app.init();
+      cachedServer = app.getHttpAdapter().getInstance();
+    }
+    return cachedServer(req, res);
+  } catch (err: any) {
+    console.error('NestJS serverless handler error:', err);
+    return res.status(500).json({ error: 'Server initialization error', message: err?.message || 'Internal Server Error' });
   }
-  return cachedServer(req, res);
 }
