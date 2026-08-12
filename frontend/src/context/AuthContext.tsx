@@ -34,11 +34,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      const savedUser = localStorage.getItem('app_user');
-      const savedToken = localStorage.getItem('app_token');
-      if (savedUser && savedToken) {
-        setUser(JSON.parse(savedUser));
-        setToken(savedToken);
+      const sessionUser = sessionStorage.getItem('app_user');
+      const sessionToken = sessionStorage.getItem('app_token');
+      if (sessionUser && sessionToken) {
+        setUser(JSON.parse(sessionUser));
+        setToken(sessionToken);
+      } else {
+        const savedUser = localStorage.getItem('app_user');
+        const savedToken = localStorage.getItem('app_token');
+        if (savedUser && savedToken) {
+          const parsed = JSON.parse(savedUser);
+          if (!parsed.isGuest) {
+            setUser(parsed);
+            setToken(savedToken);
+          } else {
+            localStorage.removeItem('app_user');
+            localStorage.removeItem('app_token');
+          }
+        }
       }
     } catch (err) {
       console.error('Failed to parse auth token', err);
@@ -48,12 +61,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const loginAsGuest = async () => {
+    localStorage.removeItem('app_user');
+    localStorage.removeItem('app_token');
     try {
       const data = await guestLoginApi();
       setUser(data.user);
       setToken(data.token);
-      localStorage.setItem('app_user', JSON.stringify(data.user));
-      localStorage.setItem('app_token', data.token);
+      sessionStorage.setItem('app_user', JSON.stringify(data.user));
+      sessionStorage.setItem('app_token', data.token);
     } catch (err) {
       const names = ['Cosmic Explorer', 'Pixel Wanderer', 'Starlight Pioneer', 'Digital Voyager', 'Neon Architect', 'Quantum Rover'];
       const avatars = [
@@ -77,12 +92,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
       setUser(defaultUser);
       setToken(`guest-session-token-${rCode}`);
-      localStorage.setItem('app_user', JSON.stringify(defaultUser));
-      localStorage.setItem('app_token', `guest-session-token-${rCode}`);
+      sessionStorage.setItem('app_user', JSON.stringify(defaultUser));
+      sessionStorage.setItem('app_token', `guest-session-token-${rCode}`);
     }
   };
 
   const loginWithGoogle = async (googleData: { email: string; name: string; avatar?: string; googleId?: string }) => {
+    sessionStorage.removeItem('app_user');
+    sessionStorage.removeItem('app_token');
     try {
       const data = await googleLoginApi(googleData);
       setUser(data.user);
@@ -110,7 +127,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser((prev) => {
       if (!prev) return null;
       const updated = { ...prev, ...updatedFields };
-      localStorage.setItem('app_user', JSON.stringify(updated));
+      if (prev.isGuest) {
+        sessionStorage.setItem('app_user', JSON.stringify(updated));
+      } else {
+        localStorage.setItem('app_user', JSON.stringify(updated));
+      }
       return updated;
     });
   };
@@ -118,6 +139,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null);
     setToken(null);
+    sessionStorage.removeItem('app_user');
+    sessionStorage.removeItem('app_token');
     localStorage.removeItem('app_user');
     localStorage.removeItem('app_token');
     window.location.replace('/login');

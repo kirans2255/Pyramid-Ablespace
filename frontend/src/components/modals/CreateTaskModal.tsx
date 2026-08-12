@@ -28,19 +28,23 @@ export function CreateTaskModal({
     e.preventDefault();
     if (!title.trim()) return;
 
-    await createTask({
-      title: title.trim(),
-      description: description.trim(),
-      status,
-      priority,
-      projectId: projectId || undefined,
-      userId: user?._id || user?.email || 'guest-1',
-      dueDate: new Date(),
-      labels: ['Deployment'],
-    });
-
-    onRefresh();
     onClose();
+
+    try {
+      await createTask({
+        title: title.trim(),
+        description: description.trim(),
+        status,
+        priority,
+        projectId: projectId || undefined,
+        userId: user?._id || user?.email || 'guest-1',
+        dueDate: new Date(),
+        labels: ['Deployment'],
+      });
+    } catch (err) {
+      console.error('Task creation failed:', err);
+    }
+    onRefresh();
   };
 
   return (
