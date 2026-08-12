@@ -228,19 +228,7 @@ export function Sidebar({
                   className="w-full flex items-center gap-2.5 px-2 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors text-left"
                 >
                   <Settings className="w-4 h-4 text-slate-500" />
-                  <span>Settings</span>
-                </button>
-
-                {/* Leave Workspace */}
-                <button
-                  onClick={() => {
-                    setUserMenuOpen(false);
-                    setShowLeaveModal(true);
-                  }}
-                  className="w-full flex items-center gap-2.5 px-2 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors text-left border-t border-slate-100 dark:border-slate-800 mt-1 pt-2"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Leave Workspace</span>
+                  <span>Settings & Profile</span>
                 </button>
               </div>
             </div>

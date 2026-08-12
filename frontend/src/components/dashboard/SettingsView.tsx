@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme, ColorMode } from '@/context/ThemeContext';
-import { ArrowLeft, Search, User, Sun, Square, Edit2, Check, Save } from 'lucide-react';
+import { ArrowLeft, Search, User, Sun, Square, Edit2, Check, Save, LogOut } from 'lucide-react';
 import { updateProfileApi } from '@/services/api';
+import { LeaveWorkspaceModal } from '../modals/LeaveWorkspaceModal';
 
 interface SettingsViewProps {
   onBackToApp: () => void;
@@ -16,6 +17,7 @@ export function SettingsView({ onBackToApp }: SettingsViewProps) {
 
   const [activeTab, setActiveTab] = useState<'profile' | 'theme' | 'color'>('profile');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
 
   // Profile Form States
   const [fullName, setFullName] = useState(user?.name || 'Dexter');
@@ -162,13 +164,14 @@ export function SettingsView({ onBackToApp }: SettingsViewProps) {
               <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Workspace access</h3>
                 <div className="flex items-center justify-between pt-1">
-                  <span className="text-xs text-slate-500 dark:text-slate-400">Remove yourself from the workspace</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Sign out and remove yourself from this workspace session</span>
                   <button
                     type="button"
-                    onClick={() => logout?.()}
-                    className="px-3.5 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-xl hover:bg-rose-100 transition-colors"
+                    onClick={() => setShowLeaveModal(true)}
+                    className="px-3.5 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/60 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors flex items-center gap-1.5"
                   >
-                    Leave Workspace
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Leave Workspace</span>
                   </button>
                 </div>
               </div>
@@ -247,6 +250,16 @@ export function SettingsView({ onBackToApp }: SettingsViewProps) {
           )}
         </div>
       </div>
+
+      {showLeaveModal && (
+        <LeaveWorkspaceModal
+          onClose={() => setShowLeaveModal(false)}
+          onConfirm={() => {
+            setShowLeaveModal(false);
+            logout();
+          }}
+        />
+      )}
     </div>
   );
 }
