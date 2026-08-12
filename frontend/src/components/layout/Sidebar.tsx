@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme, ColorMode } from '@/context/ThemeContext';
+import { LeaveWorkspaceModal } from '../modals/LeaveWorkspaceModal';
 import {
   LayoutGrid,
   FolderKanban,
@@ -12,7 +13,8 @@ import {
   Square,
   Settings,
   ChevronRight,
-  Check
+  Check,
+  LogOut
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -38,13 +40,14 @@ export function Sidebar({
   onCloseMobile,
   collapsed = false,
 }: SidebarProps) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { theme, colorMode, setTheme, setColorMode } = useTheme();
   const router = useRouter();
 
   const [workspaceOpen, setWorkspaceOpen] = useState(true);
   const [projectsOpen, setProjectsOpen] = useState(true);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState<'theme' | 'colorMode' | null>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -227,6 +230,18 @@ export function Sidebar({
                   <Settings className="w-4 h-4 text-slate-500" />
                   <span>Settings</span>
                 </button>
+
+                {/* Leave Workspace */}
+                <button
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    setShowLeaveModal(true);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-2 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors text-left border-t border-slate-100 dark:border-slate-800 mt-1 pt-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Leave Workspace</span>
+                </button>
               </div>
             </div>
           )}
@@ -332,6 +347,16 @@ export function Sidebar({
           )}
         </div>
       </aside>
+
+      {showLeaveModal && (
+        <LeaveWorkspaceModal
+          onClose={() => setShowLeaveModal(false)}
+          onConfirm={() => {
+            setShowLeaveModal(false);
+            logout();
+          }}
+        />
+      )}
     </>
   );
 }

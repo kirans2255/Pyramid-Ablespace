@@ -24,12 +24,13 @@ export function CreateTaskModal({
   const [status, setStatus] = useState(initialStatus);
   const [priority, setPriority] = useState('Medium');
 
+  const [submitting, setSubmitting] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim() || submitting) return;
 
-    onClose();
-
+    setSubmitting(true);
     try {
       await createTask({
         title: title.trim(),
@@ -41,10 +42,13 @@ export function CreateTaskModal({
         dueDate: new Date(),
         labels: ['Deployment'],
       });
+      onRefresh();
     } catch (err) {
       console.error('Task creation failed:', err);
+    } finally {
+      setSubmitting(false);
+      onClose();
     }
-    onRefresh();
   };
 
   return (
@@ -129,9 +133,13 @@ export function CreateTaskModal({
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-slate-900 dark:bg-brand-600 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl shadow-sm"
+              disabled={submitting}
+              className="px-4 py-2 bg-slate-900 dark:bg-brand-600 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl shadow-sm disabled:opacity-50 flex items-center gap-1.5"
             >
-              Create Task
+              {submitting && (
+                <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              )}
+              <span>{submitting ? 'Creating Task...' : 'Create Task'}</span>
             </button>
           </div>
         </form>

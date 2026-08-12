@@ -124,6 +124,25 @@ export function LoginPage() {
           onAddAccountSubmit={handleAddAccountSubmit}
         />
       )}
+
+      {/* Engaging Full-screen Loading Overlay */}
+      {loading && (
+        <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-md flex flex-col items-center justify-center space-y-4 animate-in fade-in duration-200">
+          <div className="relative flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full border-4 border-slate-700 border-t-white animate-spin" />
+            <div className="absolute w-7 h-7 bg-white rounded-lg flex items-center justify-center shadow-xl">
+              <svg className="w-4 h-4 text-black fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="2.5">
+                <polygon points="12 3 3 20 21 20" />
+                <line x1="12" y1="3" x2="12" y2="20" />
+              </svg>
+            </div>
+          </div>
+          <div className="text-center space-y-1">
+            <p className="text-sm font-bold text-white tracking-wide">Authenticating Session</p>
+            <p className="text-xs text-slate-300 animate-pulse font-medium">Setting up workspace environment...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
