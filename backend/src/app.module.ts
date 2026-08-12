@@ -16,7 +16,7 @@ const mongoUri = process.env.MONGODB_URI || (global as any).__MONGO_URI__ || 'mo
   imports: [
     MongooseModule.forRootAsync({
       useFactory: () => ({
-        uri: (global as any).__MONGO_URI__ || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/pyramid_task_db',
+        uri: process.env.MONGODB_URI || (global as any).__MONGO_URI__ || 'mongodb://127.0.0.1:27017/pyramid_task_db',
       }),
     }),
     MongooseModule.forFeature([
