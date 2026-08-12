@@ -10,13 +10,15 @@ async function bootstrap() {
   try {
     const conn = await mongoose.connect(defaultUri, { serverSelectionTimeoutMS: 2000 });
     await conn.disconnect();
-    console.log('Connected to local MongoDB instance:', defaultUri);
+    console.log('Connected to MongoDB instance:', defaultUri);
   } catch (err) {
-    console.log('Local MongoDB not found. Starting MongoMemoryServer fallback...');
-    const mongod = await MongoMemoryServer.create();
-    const uri = mongod.getUri();
-    (global as any).__MONGO_URI__ = uri;
-    console.log('MongoMemoryServer running at:', uri);
+    if (!process.env.VERCEL) {
+      console.log('Local MongoDB not found. Starting MongoMemoryServer fallback...');
+      const mongod = await MongoMemoryServer.create();
+      const uri = mongod.getUri();
+      (global as any).__MONGO_URI__ = uri;
+      console.log('MongoMemoryServer running at:', uri);
+    }
   }
 
   const app = await NestFactory.create(AppModule);
