@@ -5,10 +5,24 @@ import { ValidationPipe } from '@nestjs/common';
 let cachedServer: any;
 
 export default async function handler(req: any, res: any) {
+  const origin = req.headers.origin || '*';
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
+  );
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (!cachedServer) {
     const app = await NestFactory.create(AppModule);
     app.enableCors({
-      origin: '*',
+      origin: true,
       credentials: true,
     });
     app.setGlobalPrefix('api');
